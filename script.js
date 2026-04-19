@@ -53,8 +53,8 @@ function primeMusic() {
       
       // Start music on button click
       startMusicPlayback().catch(() => {
-        // If it still fails, try after a short delay
-        setTimeout(() => startMusicPlayback(), 500);
+        // If it still fails, retry immediately
+        startMusicPlayback();
       });
     });
   }
@@ -67,7 +67,7 @@ if (document.readyState === "loading") {
 }
 
 window.addEventListener("load", () => {
-  setTimeout(() => loader.classList.add("is-hidden"), 900);
+  loader.classList.add("is-hidden");
   bootPetals();
 });
 
