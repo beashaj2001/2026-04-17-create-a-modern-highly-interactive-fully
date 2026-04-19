@@ -20,33 +20,72 @@ const videoShell = document.getElementById("video-shell");
 const trailerOverlay = document.getElementById("trailer-overlay");
 const trailerFrame = document.getElementById("trailer-frame");
 
+function setMusicState(isPlaying) {
+  if (musicLabel) {
+    musicLabel.textContent = isPlaying ? "Mute Music" : "Play Music";
+  }
+
+  if (musicToggle) {
+    musicToggle.setAttribute(
+      "aria-label",
+      isPlaying ? "Mute background music" : "Play background music"
+    );
+  }
+}
+
+async function startMusicPlayback() {
+  if (!music) {
+    return false;
+  }
+
+  music.volume = 0.35;
+
+  try {
+    await music.play();
+    setMusicState(true);
+    return true;
+  } catch (error) {
+    setMusicState(false);
+    return false;
+  }
+}
+
+function primeMusic() {
+  if (!music) {
+    return;
+  }
+
+  music.preload = "auto";
+  music.load();
+  startMusicPlayback().catch(() => {
+    // If autoplay fails, set up multiple interaction listeners for mobile compatibility
+    const playOnInteraction = () => {
+      startMusicPlayback();
+      // Remove all listeners after first interaction
+      window.removeEventListener("scroll", playOnInteraction);
+      document.removeEventListener("click", playOnInteraction);
+      document.removeEventListener("touchstart", playOnInteraction);
+      document.removeEventListener("touchmove", playOnInteraction);
+      document.removeEventListener("keypress", playOnInteraction);
+    };
+    
+    window.addEventListener("scroll", playOnInteraction, { once: false });
+    document.addEventListener("click", playOnInteraction, { once: false });
+    document.addEventListener("touchstart", playOnInteraction, { once: false });
+    document.addEventListener("touchmove", playOnInteraction, { once: false });
+    document.addEventListener("keypress", playOnInteraction, { once: false });
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", primeMusic, { once: true });
+} else {
+  primeMusic();
+}
+
 window.addEventListener("load", () => {
   setTimeout(() => loader.classList.add("is-hidden"), 900);
   bootPetals();
-  
-  // Start music immediately on page load
-  music.volume = 0.35;
-  
-  const playMusic = () => {
-    music.play().then(() => {
-      musicLabel.textContent = "Mute Music";
-      musicToggle.setAttribute("aria-label", "Mute background music");
-    }).catch(() => {
-      // If autoplay fails, set up to play on first interaction
-      document.addEventListener("click", startMusicOnInteraction);
-      document.addEventListener("touchstart", startMusicOnInteraction);
-    });
-  };
-  
-  const startMusicOnInteraction = () => {
-    music.play();
-    musicLabel.textContent = "Mute Music";
-    musicToggle.setAttribute("aria-label", "Mute background music");
-    document.removeEventListener("click", startMusicOnInteraction);
-    document.removeEventListener("touchstart", startMusicOnInteraction);
-  };
-  
-  playMusic();
 });
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -209,40 +248,40 @@ if (trailerOverlay && videoShell && trailerFrame) {
   });
 }
 
-musicToggle.addEventListener("click", async () => {
-  try {
+if (musicToggle && music) {
+  musicToggle.addEventListener("click", async () => {
     if (music.paused) {
-      music.volume = 0.35;
-      await music.play();
-      musicLabel.textContent = "Mute Music";
-      musicToggle.setAttribute("aria-label", "Mute background music");
-    } else {
-      music.pause();
-      musicLabel.textContent = "Play Music";
-      musicToggle.setAttribute("aria-label", "Play background music");
+      const started = await startMusicPlayback();
+      if (!started && musicLabel) {
+        musicLabel.textContent = "Tap Again";
+      }
+      return;
     }
-  } catch (error) {
-    musicLabel.textContent = "Tap Again";
-  }
-});
 
-music.addEventListener("pause", () => {
-  musicLabel.textContent = "Play Music";
-  musicToggle.setAttribute("aria-label", "Play background music");
-});
+    music.pause();
+    setMusicState(false);
+  });
+}
 
-music.addEventListener("play", () => {
-  musicLabel.textContent = "Mute Music";
-  musicToggle.setAttribute("aria-label", "Mute background music");
-});
+if (music) {
+  music.addEventListener("pause", () => {
+    setMusicState(false);
+  });
 
-wishesForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const data = new FormData(wishesForm);
-  const name = data.get("name");
-  wishesNote.textContent = `Blessings received with love, ${name}.`;
-  wishesForm.reset();
-});
+  music.addEventListener("play", () => {
+    setMusicState(true);
+  });
+}
+
+if (wishesForm && wishesNote) {
+  wishesForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(wishesForm);
+    const name = data.get("name");
+    wishesNote.textContent = `Blessings received with love, ${name}.`;
+    wishesForm.reset();
+  });
+}
 
 function bootPetals() {
   const canvas = document.getElementById("petal-canvas");
