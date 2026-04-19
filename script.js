@@ -1,4 +1,6 @@
 const loader = document.getElementById("loader");
+const invitationSplash = document.getElementById("invitation-splash");
+const openInvitationBtn = document.getElementById("open-invitation");
 const revealItems = document.querySelectorAll(".reveal");
 const tiltCards = document.querySelectorAll(".tilt-card");
 const progressBar = document.querySelector(".progress-pill span");
@@ -10,8 +12,6 @@ const lightboxImage = document.getElementById("lightbox-image");
 const lightboxTitle = document.getElementById("lightbox-title");
 const lightboxClose = document.getElementById("lightbox-close");
 const music = document.getElementById("bg-music");
-const musicToggle = document.getElementById("music-toggle");
-const musicLabel = document.querySelector(".music-toggle__label");
 const wishesForm = document.getElementById("wishes-form");
 const wishesNote = document.getElementById("wishes-note");
 const parallaxShells = document.querySelectorAll(".parallax-shell");
@@ -20,18 +20,7 @@ const videoShell = document.getElementById("video-shell");
 const trailerOverlay = document.getElementById("trailer-overlay");
 const trailerFrame = document.getElementById("trailer-frame");
 
-function setMusicState(isPlaying) {
-  if (musicLabel) {
-    musicLabel.textContent = isPlaying ? "Mute Music" : "Play Music";
-  }
-
-  if (musicToggle) {
-    musicToggle.setAttribute(
-      "aria-label",
-      isPlaying ? "Mute background music" : "Play background music"
-    );
-  }
-}
+// Music plays automatically without controls
 
 async function startMusicPlayback() {
   if (!music) {
@@ -42,10 +31,8 @@ async function startMusicPlayback() {
 
   try {
     await music.play();
-    setMusicState(true);
     return true;
   } catch (error) {
-    setMusicState(false);
     return false;
   }
 }
@@ -57,24 +44,20 @@ function primeMusic() {
 
   music.preload = "auto";
   music.load();
-  startMusicPlayback().catch(() => {
-    // If autoplay fails, set up multiple interaction listeners for mobile compatibility
-    const playOnInteraction = () => {
-      startMusicPlayback();
-      // Remove all listeners after first interaction
-      window.removeEventListener("scroll", playOnInteraction);
-      document.removeEventListener("click", playOnInteraction);
-      document.removeEventListener("touchstart", playOnInteraction);
-      document.removeEventListener("touchmove", playOnInteraction);
-      document.removeEventListener("keypress", playOnInteraction);
-    };
-    
-    window.addEventListener("scroll", playOnInteraction, { once: false });
-    document.addEventListener("click", playOnInteraction, { once: false });
-    document.addEventListener("touchstart", playOnInteraction, { once: false });
-    document.addEventListener("touchmove", playOnInteraction, { once: false });
-    document.addEventListener("keypress", playOnInteraction, { once: false });
-  });
+  
+  // Set up splash screen interaction to trigger music
+  if (openInvitationBtn && invitationSplash) {
+    openInvitationBtn.addEventListener("click", () => {
+      // Hide splash screen
+      invitationSplash.classList.add("is-hidden");
+      
+      // Start music on button click
+      startMusicPlayback().catch(() => {
+        // If it still fails, try after a short delay
+        setTimeout(() => startMusicPlayback(), 500);
+      });
+    });
+  }
 }
 
 if (document.readyState === "loading") {
@@ -245,31 +228,6 @@ if (trailerOverlay && videoShell && trailerFrame) {
   trailerOverlay.addEventListener("click", () => {
     videoShell.classList.add("is-playing");
     trailerFrame.src = trailerFrame.dataset.autoplaySrc;
-  });
-}
-
-if (musicToggle && music) {
-  musicToggle.addEventListener("click", async () => {
-    if (music.paused) {
-      const started = await startMusicPlayback();
-      if (!started && musicLabel) {
-        musicLabel.textContent = "Tap Again";
-      }
-      return;
-    }
-
-    music.pause();
-    setMusicState(false);
-  });
-}
-
-if (music) {
-  music.addEventListener("pause", () => {
-    setMusicState(false);
-  });
-
-  music.addEventListener("play", () => {
-    setMusicState(true);
   });
 }
 

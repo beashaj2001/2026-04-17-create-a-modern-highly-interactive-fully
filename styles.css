@@ -25,11 +25,7 @@
 
 html {
   scroll-behavior: smooth;
-}
-
-html,
-body {
-  overscroll-behavior-y: none;
+  overflow-x: hidden;
 }
 
 body {
@@ -86,6 +82,108 @@ main {
   z-index: 2;
 }
 
+.invitation-splash {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(223, 182, 172, 0.22), transparent 22%),
+    linear-gradient(180deg, #f9f4ec 0%, #f3ecdf 32%, #f8f2e9 68%, #f3ebde 100%);
+  z-index: 51;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.invitation-splash.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.invitation-splash__content {
+  text-align: center;
+  padding: 2rem;
+  animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.invitation-splash__envelope {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+}
+
+.invitation-splash__envelope svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 12px 24px rgba(86, 52, 20, 0.16));
+}
+
+.invitation-splash__content h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #433125;
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+.invitation-splash__content p {
+  font-family: "Great Vibes", cursive;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #b78532;
+  margin: 1rem 0 2rem;
+}
+
+.invitation-splash__button {
+  background: linear-gradient(135deg, #b78532, #a6723f);
+  color: #fff8ef;
+  border: none;
+  padding: 0.95rem 2.5rem;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: "Manrope", sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(183, 133, 50, 0.3);
+  margin-top: 1.5rem;
+}
+
+.invitation-splash__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(183, 133, 50, 0.4);
+}
+
+.invitation-splash__button:active {
+  transform: translateY(0);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .loader {
   position: fixed;
   inset: 0;
@@ -134,21 +232,16 @@ main {
   z-index: 0;
 }
 
-.music-toggle,
 .progress-pill {
   position: fixed;
   z-index: 10;
-}
-
-.music-toggle {
-  right: 1rem;
-  bottom: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.95rem 1.1rem;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(240px, calc(100vw - 2rem));
+  height: 12px;
   border-radius: 999px;
-  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .glass-button,
@@ -158,15 +251,7 @@ main {
   backdrop-filter: blur(16px);
 }
 
-.progress-pill {
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(240px, calc(100vw - 2rem));
-  height: 12px;
-  border-radius: 999px;
-  overflow: hidden;
-}
+
 
 .progress-pill span {
   display: block;
@@ -365,9 +450,7 @@ main {
 .hero__countdown {
   margin-top: 2rem;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.85rem;
-  max-width: 620px;
+  grid-template-col max-width: 620px;
 }
 
 .hero__countdown div {
@@ -1689,88 +1772,82 @@ main {
   }
 
   .music-toggle {
-    right: 0.75rem;
-    bottom: max(0.75rem, env(safe-area-inset-bottom));
-    padding: 0.8rem 0.95rem;
-    min-height: 48px;
-    border-radius: 18px;
+
+    .progress-pill {
+      top: 0.75rem;
+      width: min(220px, calc(100vw - 2rem));
+    }
+
+    .blessing__panel,
+    .hero__card-inner,
+    .detail-card,
+    .timeline__item,
+    .venue__card,
+    .wishes__form,
+    .contact__card {
+      border-radius: 24px;
+    }
+
+    .contact__card {
+      padding: 1.8rem 1.15rem;
+    }
+
+    .contact__text {
+      font-size: 0.96rem;
+      line-height: 1.7;
+    }
+
+    .contact__person {
+      padding: 1.5rem 1.8rem;
+      min-width: auto;
+    }
+
+    .contact__name {
+      font-size: 1.2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .contact__phone {
+      font-size: 1.1rem;
+      gap: 0.6rem;
+    }
+
+    .contact__phone-icon {
+      font-size: 1.2rem;
+    }
+
+    .reveal {
+      transform: translateY(24px) scale(0.985);
+      transition-duration: 0.65s;
+    }
+
+    .tilt-card {
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, filter 0.35s ease;
+    }
   }
 
-  .progress-pill {
-    top: 0.75rem;
-    width: min(220px, calc(100vw - 2rem));
-  }
+  @media (max-width: 720px) and (hover: none) and (pointer: coarse) {
+    .tilt-card:hover {
+      box-shadow: var(--shadow);
+      filter: none;
+    }
 
-  .blessing__panel,
-  .hero__card-inner,
-  .detail-card,
-  .timeline__item,
-  .venue__card,
-  .wishes__form,
-  .contact__card {
-    border-radius: 24px;
-  }
+    .hero__card,
+    .blessing__panel,
+    .detail-card,
+    .trailer__frame,
+    .timeline__item,
+    .venue__card,
+    .wishes__form,
+    .gallery-card {
+      transform: none !important;
+    }
 
-  .contact__card {
-    padding: 1.8rem 1.15rem;
+    .gallery-card:active,
+    .primary-button:active,
+    .secondary-button:active,
+    .gallery__tab:active,
+    .music-toggle:active {
+      transform: scale(0.985);
+    }
   }
-
-  .contact__text {
-    font-size: 0.96rem;
-    line-height: 1.7;
-  }
-
-  .contact__person {
-    padding: 1.5rem 1.8rem;
-    min-width: auto;
-  }
-
-  .contact__name {
-    font-size: 1.2rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .contact__phone {
-    font-size: 1.1rem;
-    gap: 0.6rem;
-  }
-
-  .contact__phone-icon {
-    font-size: 1.2rem;
-  }
-
-  .reveal {
-    transform: translateY(24px) scale(0.985);
-    transition-duration: 0.65s;
-  }
-
-  .tilt-card {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, filter 0.35s ease;
-  }
-}
-
-@media (max-width: 720px) and (hover: none) and (pointer: coarse) {
-  .tilt-card:hover {
-    box-shadow: var(--shadow);
-    filter: none;
-  }
-
-  .hero__card,
-  .blessing__panel,
-  .detail-card,
-  .trailer__frame,
-  .timeline__item,
-  .venue__card,
-  .wishes__form,
-  .gallery-card {
-    transform: none !important;
-  }
-
-  .gallery-card:active,
-  .primary-button:active,
-  .secondary-button:active,
-  .gallery__tab:active,
-  .music-toggle:active {
-    transform: scale(0.985);
-  }
-}
